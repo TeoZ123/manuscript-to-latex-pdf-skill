@@ -1,23 +1,46 @@
 # Manuscript to LaTeX PDF Skill
 
+[中文](README.zh-CN.md) | English
+
+[![CI](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/TeoZ123/manuscript-to-latex-pdf-skill)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Codex Skill](https://img.shields.io/badge/Codex-Skill-1f6feb)](manuscript-to-latex-pdf/SKILL.md)
+
 A Codex skill for converting Word or Markdown manuscripts into reviewable Markdown sources, template-compliant LaTeX projects, and compiled PDFs.
 
-The skill is designed for theses, papers, reports, and other formal manuscripts where the final PDF must follow a user-provided LaTeX template rather than a generic layout.
+It is built for theses, papers, reports, and formal manuscripts where the final PDF must follow a user-provided LaTeX template rather than a generic layout.
+
+![Example workflow figure](examples/附件/图1-1-论文转换流程示意图.svg)
+
+## Visual Workflow
+
+```mermaid
+flowchart LR
+    A["Word / Markdown manuscript"] --> B["Input audit"]
+    B --> C["Reviewable Markdown source"]
+    C --> D["Template rule extraction"]
+    D --> E["LaTeX project"]
+    E --> F["Compiled PDF"]
+    F --> G["User review"]
+    G -->|"feedback"| D
+```
 
 ## What It Does
 
-- Audits `.docx` or Markdown manuscripts before conversion.
-- Converts Word input into a single reviewable Markdown source by default.
-- Keeps figures, tables, captions, source notes, references, appendices, and back matter in the manuscript flow.
-- Extracts template rules from user-provided LaTeX files and examples.
-- Guides LaTeX project generation and PDF compilation.
-- Produces intermediate files so every stage can be reviewed, corrected, and resumed.
+| Stage | Output | Purpose |
+| --- | --- | --- |
+| Audit | `00-输入审计.md` | Detect DOCX structure, styles, images, tables, comments, revisions, notes, and references. |
+| Source | `01-论文主源.md` | Keep a human-editable manuscript source with figures, tables, captions, references, and back matter. |
+| Check | `02-转换检查.md` | Validate image links, figure/table captions, citations, references, placeholders, and manual review risks. |
+| Template rules | `00-模板规则.md` | Summarize the formatting rules extracted from the user-provided LaTeX template. |
+| LaTeX/PDF | `03-LaTeX工程/`, `04-PDF输出/` | Generate a template-compliant LaTeX project and compile the final PDF. |
 
 ## What It Does Not Do
 
 - It does not rewrite academic content unless the user explicitly asks.
 - It does not fabricate references, source notes, figure numbers, table numbers, page numbers, or successful validation status.
-- It does not include any school-specific template rules by default.
+- It does not include school-specific or journal-specific template rules by default.
 - It does not guarantee perfect Word fidelity for complex DOCX features such as merged tables, tracked changes, footnotes, comments, automatic numbering, floating text boxes, or embedded objects. These are flagged for manual review.
 
 ## Install
@@ -32,20 +55,25 @@ Then ask Codex to use `$manuscript-to-latex-pdf`.
 
 Only the `manuscript-to-latex-pdf/` directory is the skill. Repository-level files such as this README, examples, tests, and GitHub Actions are for public distribution and development.
 
-## Expected Workflow
+## Quick Start
 
-1. Provide a Word or Markdown manuscript.
-2. Provide the LaTeX template files, such as `.cls`, `.sty`, `main.tex`, sample chapter `.tex`, sample PDF, compile notes, and bibliography examples.
-3. Run an input audit.
-4. Convert or normalize the manuscript into Markdown.
-5. Validate images, figures, tables, citations, references, and placeholders.
-6. Generate a LaTeX project based on the extracted template rules.
-7. Compile the PDF.
-8. Review the PDF and update template rules when the template evidence or user preference requires it.
+```bash
+# 1. Audit a DOCX manuscript
+python3 manuscript-to-latex-pdf/scripts/audit_docx.py manuscript.docx \
+  -o 00-输入审计.md \
+  --json-output 00-输入审计.json
+
+# 2. Extract DOCX to Markdown
+python3 manuscript-to-latex-pdf/scripts/extract_docx_to_md.py manuscript.docx \
+  -o 01-论文主源.md \
+  --assets-dir 附件
+
+# 3. Validate the Markdown source
+python3 manuscript-to-latex-pdf/scripts/validate_manuscript.py 01-论文主源.md \
+  -o 02-转换检查.md
+```
 
 ## Default Output Layout
-
-The skill uses Chinese names for user-facing intermediate files:
 
 ```text
 00-模板规则.md
@@ -55,7 +83,7 @@ The skill uses Chinese names for user-facing intermediate files:
 04-PDF输出/
 ```
 
-For large manuscripts, it may split Markdown into chapter files:
+For large manuscripts, the skill may split the Markdown source into chapter files:
 
 ```text
 01-Markdown主源/
@@ -69,31 +97,34 @@ For large manuscripts, it may split Markdown into chapter files:
 
 Splitting is for context management only. Figures and tables should remain in the relevant chapter context.
 
-## Bundled Scripts
+## Template Inputs
 
-Run these from the repository root or from the skill folder.
+Ask the user for the template evidence before generating LaTeX:
 
-Audit DOCX structure:
+- `.cls` / `.sty`
+- `main.tex`
+- sample chapter `.tex`
+- sample PDF
+- bibliography examples
+- compile notes
+- any official formatting instructions
 
-```bash
-python3 manuscript-to-latex-pdf/scripts/audit_docx.py manuscript.docx -o 00-输入审计.md --json-output 00-输入审计.json
-```
-
-Extract DOCX to Markdown:
-
-```bash
-python3 manuscript-to-latex-pdf/scripts/extract_docx_to_md.py manuscript.docx -o 01-论文主源.md --assets-dir 附件
-```
-
-Validate Markdown source:
-
-```bash
-python3 manuscript-to-latex-pdf/scripts/validate_manuscript.py 01-论文主源.md -o 02-转换检查.md
-```
+The LaTeX template is the formatting authority. Markdown is the human-editable content authority after extraction.
 
 ## Examples
 
-See `examples/` for a minimal Markdown manuscript, a sample template-rule summary, and an expected validation report.
+The `examples/` directory contains:
+
+- `examples/01-论文主源.md`
+- `examples/00-模板规则.md`
+- `examples/02-转换检查.expected.md`
+- `examples/附件/图1-1-论文转换流程示意图.svg`
+
+Run the smoke test:
+
+```bash
+python3 tests/smoke_test.py
+```
 
 ## Public Template Guidance
 
@@ -103,14 +134,12 @@ For template examples, use a tiny self-authored template fixture or a template t
 
 ## Development
 
-Run local checks:
-
 ```bash
 python3 -m py_compile manuscript-to-latex-pdf/scripts/*.py tests/*.py
 python3 tests/smoke_test.py
 ```
 
-The GitHub Actions workflow runs the same checks on push and pull request.
+GitHub Actions runs the same checks on push and pull request.
 
 ## License
 
