@@ -9,13 +9,13 @@
 [![CI](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TeoZ123/manuscript-to-latex-pdf-skill)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Codex Skill](https://img.shields.io/badge/Codex-Skill-1f6feb)](manuscript-to-latex-pdf/SKILL.md)
+[![AI Agent Skill](https://img.shields.io/badge/AI%20Agent-Skill-1f6feb)](manuscript-to-latex-pdf/SKILL.md)
 
 </div>
 
 ![流程总览](assets/readme/overview.svg)
 
-这是一个面向正式论文与报告排版的 Codex skill。它适合学位论文、课程论文、期刊论文、研究报告等场景，目标不是生成一个通用 PDF，而是根据用户提供的 LaTeX 模板、范例和格式说明，输出符合模板要求的 LaTeX 工程和 PDF。
+这是一个面向正式论文与报告排版的 AI agent skill。它适合学位论文、课程论文、期刊论文、研究报告等场景，目标不是生成一个通用 PDF，而是根据用户提供的 LaTeX 模板、范例和格式说明，输出符合模板要求的 LaTeX 工程和 PDF。
 
 它把转换过程拆成可检查的阶段：Word 是输入来源，Markdown 是后续人工审阅和修改的主源，LaTeX 模板是格式权威，每一层处理结果都会保存为本地文件。
 
@@ -49,17 +49,23 @@ flowchart LR
 | 模板规则 | `00-模板规则.md` | 根据 `.cls`、`.sty`、`main.tex`、章节范例、模板 PDF 和参考文献范例抽取格式规则。 |
 | LaTeX/PDF | `03-LaTeX工程/`, `04-PDF输出/` | 生成符合模板规则的 LaTeX 工程并编译 PDF。 |
 
-## 安装
+## 用在 AI Agent 中
 
-把 skill 目录复制到 Codex skills 目录：
+把 `manuscript-to-latex-pdf/` 目录作为 agent 的任务说明包使用。对于 Codex，可以复制到本地 skills 目录：
 
 ```bash
 cp -R manuscript-to-latex-pdf ~/.codex/skills/
 ```
 
-然后在 Codex 中请求使用 `$manuscript-to-latex-pdf`。
+对于其他支持本地文件或自定义指令的 AI agent，可以直接附上或引用这个目录，并要求 agent 按照 `manuscript-to-latex-pdf/SKILL.md` 执行。
 
-注意：只有 `manuscript-to-latex-pdf/` 目录是 skill 本体。仓库根目录的 README、示例、测试和 GitHub Actions 是公开发布与开发材料。
+自然语言指令示例：
+
+```text
+请使用 manuscript-to-latex-pdf skill，把我的 Word 或 Markdown 论文转换为干净的 Markdown 主源，根据我提供的 LaTeX 模板学习格式规则，生成 LaTeX 工程，编译 PDF，并把每一步中间结果保存到本地。
+```
+
+注意：只有 `manuscript-to-latex-pdf/` 目录是可复用的 agent skill。仓库根目录的 README、示例、测试和 GitHub Actions 是公开发布与开发材料。
 
 ## 快速开始
 
@@ -110,9 +116,9 @@ python3 manuscript-to-latex-pdf/scripts/validate_manuscript.py 01-论文主源.m
 
 拆分只是为了控制上下文和便于局部修改。图片和表格仍应保留在对应章节语境中。
 
-## 需要提供哪些模板证据
+## 准备 LaTeX 模板
 
-生成 LaTeX 前，应尽量提供以下材料：
+生成 LaTeX 前，应尽量向 agent 提供能够定义目标格式的模板文件和范例：
 
 - `.cls` / `.sty`
 - `main.tex`
@@ -150,7 +156,7 @@ examples/
 python3 tests/smoke_test.py
 ```
 
-## 公开模板注意事项
+## 处理私有文档
 
 不要把私人论文、盲审意见、付费模板、个人信息、未公开论文内容提交到公开仓库。
 

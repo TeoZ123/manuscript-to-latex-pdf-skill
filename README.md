@@ -9,13 +9,13 @@
 [![CI](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TeoZ123/manuscript-to-latex-pdf-skill)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Codex Skill](https://img.shields.io/badge/Codex-Skill-1f6feb)](manuscript-to-latex-pdf/SKILL.md)
+[![AI Agent Skill](https://img.shields.io/badge/AI%20Agent-Skill-1f6feb)](manuscript-to-latex-pdf/SKILL.md)
 
 </div>
 
 ![Workflow overview](assets/readme/overview.svg)
 
-This repository contains a Codex skill for formal manuscript conversion. It is built for theses, papers, reports, and other documents where the final PDF must follow a user-provided LaTeX template rather than a generic layout.
+This repository contains an AI-agent skill for formal manuscript conversion. It is built for theses, papers, reports, and other documents where the final PDF must follow a user-provided LaTeX template rather than a generic layout.
 
 The skill keeps conversion work inspectable: Word is treated as input, Markdown becomes the human-editable source, the LaTeX template is the formatting authority, and every intermediate report is saved locally.
 
@@ -49,17 +49,23 @@ flowchart LR
 | Template rules | `00-模板规则.md` | Summarize formatting rules extracted from `.cls`, `.sty`, `main.tex`, sample `.tex`, sample PDF, and bibliography examples. |
 | LaTeX/PDF | `03-LaTeX工程/`, `04-PDF输出/` | Generate a template-compliant LaTeX project and compile the final PDF. |
 
-## Install
+## Use with an AI Agent
 
-Copy the skill folder into your Codex skills directory:
+Use the `manuscript-to-latex-pdf/` folder as the agent instruction package. For Codex, copy it into your local skills directory:
 
 ```bash
 cp -R manuscript-to-latex-pdf ~/.codex/skills/
 ```
 
-Then ask Codex to use `$manuscript-to-latex-pdf`.
+For other AI coding agents, attach or reference the same folder and ask the agent to follow `manuscript-to-latex-pdf/SKILL.md`.
 
-Only `manuscript-to-latex-pdf/` is the skill. Repository-level files such as this README, examples, tests, and GitHub Actions are for public distribution and development.
+Natural-language prompt:
+
+```text
+Use the manuscript-to-latex-pdf skill. Convert my Word or Markdown manuscript into a clean Markdown source, learn the formatting rules from my LaTeX template, generate a LaTeX project, compile the PDF, and save each intermediate result locally.
+```
+
+Only `manuscript-to-latex-pdf/` is the reusable agent skill. Repository-level files such as this README, examples, tests, and GitHub Actions are for public distribution and development.
 
 ## Quick Start
 
@@ -110,9 +116,9 @@ For large manuscripts, the skill may split the Markdown source into chapter file
 
 Splitting is for context management only. Figures and tables should remain in the relevant chapter context.
 
-## Template Evidence Needed
+## Provide a LaTeX Template
 
-Before generating LaTeX, provide as much template evidence as possible:
+Before generating LaTeX, give the agent the template files and examples that define the target format:
 
 - `.cls` / `.sty`
 - `main.tex`
@@ -150,7 +156,7 @@ Run the smoke test:
 python3 tests/smoke_test.py
 ```
 
-## Privacy and Template Safety
+## Use with Private Documents
 
 Do not commit private manuscripts, confidential review comments, paid school templates, personal data, or unreleased thesis content to a public repository.
 
