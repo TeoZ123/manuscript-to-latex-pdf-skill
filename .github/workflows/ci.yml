@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile Python scripts
+        run: python -m py_compile manuscript-to-latex-pdf/scripts/*.py tests/*.py
+
+      - name: Run smoke test
+        run: python tests/smoke_test.py
+
+      - name: Validate skill metadata
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("manuscript-to-latex-pdf/SKILL.md").read_text(encoding="utf-8")
+          assert text.startswith("---\n"), "SKILL.md must start with YAML frontmatter"
+          head = text.split("---", 2)[1]
+          assert "name: manuscript-to-latex-pdf" in head
+          assert "description:" in head
+          assert Path("manuscript-to-latex-pdf/agents/openai.yaml").exists()
+          PY
