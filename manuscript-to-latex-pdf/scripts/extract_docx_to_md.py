@@ -59,7 +59,7 @@ def heading_level(style: str, text: str) -> int | None:
         return int(m.group(1))
     if re.match(r"^第[一二三四五六七八九十百]+章", text):
         return 1
-    m = re.match(r"^([0-9]+(?:\\.[0-9]+){0,4})\\s+", text)
+    m = re.match(r"^([0-9]+(?:\.[0-9]+){0,4})\s+", text)
     if m:
         return min(m.group(1).count(".") + 2, 6)
     if text in {"摘要", "Abstract", "ABSTRACT", "参考文献", "References", "Bibliography", "附录", "致谢"}:
@@ -154,4 +154,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

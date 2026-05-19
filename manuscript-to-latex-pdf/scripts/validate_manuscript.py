@@ -26,13 +26,14 @@ def main() -> int:
         if not path.exists():
             missing_images.append(link)
 
-    figure_captions = re.findall(r"图\\s*([0-9]+(?:-[0-9]+)?)\\s+(.+)", text)
-    table_captions = re.findall(r"表\\s*([0-9]+(?:-[0-9]+)?)\\s+(.+)", text)
-    body_cites = sorted(set(re.findall(r"\\[([0-9]+)\\]", text)), key=lambda x: int(x))
-    ref_section = re.search(r"(?ims)^#*\\s*(参考文献|references|bibliography)\\s*$([\\s\\S]*)", text)
+    body_verbs = r"(?:展示|显示|所示|列出|列示|总结|说明|呈现)"
+    figure_captions = re.findall(rf"(?m)^\s*图\s*([0-9]+(?:-[0-9]+)?)\s+(?!{body_verbs})(.+)$", text)
+    table_captions = re.findall(rf"(?m)^\s*表\s*([0-9]+(?:-[0-9]+)?)\s+(?!{body_verbs})(.+)$", text)
+    body_cites = sorted(set(re.findall(r"\[([0-9]+)\]", text)), key=lambda x: int(x))
+    ref_section = re.search(r"(?ims)^#*\s*(参考文献|references|bibliography)\s*$([\s\S]*)", text)
     refs = []
     if ref_section:
-        refs = re.findall(r"(?m)^\\s*\\[([0-9]+)]", ref_section.group(2))
+        refs = re.findall(r"(?m)^\s*\[([0-9]+)]", ref_section.group(2))
     ref_set = set(refs)
     cite_set = set(body_cites)
 
@@ -104,4 +105,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

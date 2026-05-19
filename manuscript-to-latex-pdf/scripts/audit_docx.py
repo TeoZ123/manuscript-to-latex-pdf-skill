@@ -68,9 +68,9 @@ def main() -> int:
             style = paragraph_style(p)
             if style:
                 style_counts[style] += 1
-            if style.lower().startswith("heading") or re.match(r"^(第[一二三四五六七八九十百]+章|[0-9]+(\\.[0-9]+)*)", text):
+            if style.lower().startswith("heading") or re.match(r"^(第[一二三四五六七八九十百]+章|[0-9]+(\.[0-9]+)*)", text):
                 outline.append({"line": idx, "style": style, "text": text[:120]})
-            if re.match(r"^(参考文献|references|bibliography|参考资料)\\s*$", text, re.I):
+            if re.match(r"^(参考文献|references|bibliography|参考资料)\s*$", text, re.I):
                 reference_heading_lines.append(idx)
             revision_markers += len(p.findall(".//w:ins", NS)) + len(p.findall(".//w:del", NS))
 
@@ -156,4 +156,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
