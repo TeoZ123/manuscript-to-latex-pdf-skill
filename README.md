@@ -2,9 +2,7 @@
 
 # Manuscript to LaTeX PDF Skill
 
-**Turn Word or Markdown manuscripts into reviewable Markdown sources, template-compliant LaTeX projects, and compiled PDFs.**
-
-[中文](README.zh-CN.md) | English
+**把 Word / Markdown 论文转换为可审阅 Markdown 主源、LaTeX 工程和符合模板要求的 PDF。**
 
 [![CI](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TeoZ123/manuscript-to-latex-pdf-skill)](https://github.com/TeoZ123/manuscript-to-latex-pdf-skill/releases)
@@ -13,86 +11,88 @@
 
 </div>
 
-![Workflow overview](assets/readme/overview.svg)
+![流程总览](assets/readme/overview.svg)
 
-This repository contains an AI-agent skill for formal manuscript conversion. It is built for theses, papers, reports, and other documents where the final PDF must follow a user-provided LaTeX template rather than a generic layout.
+## 项目简介
 
-The skill keeps conversion work inspectable: Word is treated as input, Markdown becomes the human-editable source, the LaTeX template is the formatting authority, and every intermediate report is saved locally.
+这是一个面向论文、报告和正式文档排版的 AI Agent Skill。它的目标不是“随便生成一个 PDF”，而是让 AI 助手根据你提供的 LaTeX 模板和范例，逐步完成：
 
-## Why This Exists
+- 从 Word 或 Markdown 原稿中整理出可审阅的 Markdown 主源。
+- 从 LaTeX 模板中提取格式规则。
+- 生成可复查的 LaTeX 工程。
+- 编译输出符合模板要求的 PDF。
+- 保存每一步中间结果，方便定位问题和反复修改。
 
-Most manuscript conversion workflows fail in two ways: they hide conversion errors until the final PDF, or they turn LaTeX into the only editable source. This skill uses a staged workflow so authors can review the manuscript source, template rules, validation report, LaTeX project, and PDF separately.
+适合学位论文、课程论文、期刊论文、研究报告、项目文档等需要严格格式控制的场景。
 
-## Workflow
+## 为什么需要这个 Skill
 
-```mermaid
-flowchart LR
-    A["Word / Markdown manuscript"] --> B["Input audit"]
-    B --> C["Reviewable Markdown source"]
-    C --> D["Manuscript validation"]
-    D --> E["Template rule extraction"]
-    E --> F["LaTeX project"]
-    F --> G["Compiled PDF"]
-    G --> H["User review"]
-    H -->|"format feedback"| E
+很多论文转换流程有两个问题：
+
+- 直接跳到 PDF，错误只在最后暴露，排查成本高。
+- 直接把 LaTeX 当主源，作者很难继续审阅正文、图表、参考文献和附录。
+
+这个 Skill 把流程拆开：Word 是输入来源，Markdown 是正文主源，LaTeX 模板负责格式，PDF 是最终结果。每一步都有本地文件，便于验收、回滚和继续修改。
+
+## 快速开始
+
+把 `manuscript-to-latex-pdf/` 目录交给支持本地文件或自定义指令的 AI 助手，然后使用下面的自然语言指令：
+
+```text
+请使用 manuscript-to-latex-pdf skill，把我的 Word 或 Markdown 论文转换为干净的 Markdown 主源，根据我提供的 LaTeX 模板学习格式规则，生成 LaTeX 工程，编译 PDF，并把每一步中间结果保存到本地。
 ```
 
-![Validation report preview](assets/readme/report-preview.svg)
-
-## What It Produces
-
-| Stage | Output | Purpose |
-| --- | --- | --- |
-| Input audit | `00-输入审计.md` | Detect DOCX structure, styles, images, tables, comments, revisions, notes, and reference-section clues. |
-| Markdown source | `01-论文主源.md` | Keep figures, tables, captions, source notes, citations, references, appendices, acknowledgements, and back matter in one reviewable source. |
-| Conversion check | `02-转换检查.md` | Validate image links, figure/table captions, citations, references, placeholders, HTML tables, and manual review risks. |
-| Template rules | `00-模板规则.md` | Summarize formatting rules extracted from `.cls`, `.sty`, `main.tex`, sample `.tex`, sample PDF, and bibliography examples. |
-| LaTeX/PDF | `03-LaTeX工程/`, `04-PDF输出/` | Generate a template-compliant LaTeX project and compile the final PDF. |
-
-## Use with an AI Agent
-
-Use the `manuscript-to-latex-pdf/` folder as the agent instruction package. For Codex, copy it into your local skills directory:
+如果使用 Codex，可以把 skill 目录复制到本地 skills 目录：
 
 ```bash
 cp -R manuscript-to-latex-pdf ~/.codex/skills/
 ```
 
-For other AI coding agents, attach or reference the same folder and ask the agent to follow `manuscript-to-latex-pdf/SKILL.md`.
-
-Natural-language prompt:
-
-```text
-Use the manuscript-to-latex-pdf skill. Convert my Word or Markdown manuscript into a clean Markdown source, learn the formatting rules from my LaTeX template, generate a LaTeX project, compile the PDF, and save each intermediate result locally.
-```
-
-Only `manuscript-to-latex-pdf/` is the reusable agent skill. Repository-level files such as this README, examples, tests, and GitHub Actions are for public distribution and development.
-
-## Quick Start
-
-Audit a Word manuscript:
+也可以不通过 AI 助手，直接运行内置脚本完成基础检查：
 
 ```bash
+# 1. 审计 Word 原稿结构
 python3 manuscript-to-latex-pdf/scripts/audit_docx.py manuscript.docx \
   -o 00-输入审计.md \
   --json-output 00-输入审计.json
-```
 
-Extract Word to Markdown:
-
-```bash
+# 2. 将 Word 转为 Markdown 主源
 python3 manuscript-to-latex-pdf/scripts/extract_docx_to_md.py manuscript.docx \
   -o 01-论文主源.md \
   --assets-dir 附件
-```
 
-Validate the Markdown source:
-
-```bash
+# 3. 检查 Markdown 主源
 python3 manuscript-to-latex-pdf/scripts/validate_manuscript.py 01-论文主源.md \
   -o 02-转换检查.md
 ```
 
-## Default Output Layout
+## 工作流程
+
+```mermaid
+flowchart LR
+    A["Word / Markdown 原稿"] --> B["输入审计"]
+    B --> C["Markdown 主源"]
+    C --> D["主源检查"]
+    D --> E["模板规则整理"]
+    E --> F["LaTeX 工程"]
+    F --> G["PDF 输出"]
+    G --> H["人工验收"]
+    H -->|"修改意见"| E
+```
+
+![检查报告示例](assets/readme/report-preview.svg)
+
+## 输出结果
+
+| 阶段 | 输出文件 | 作用 |
+| --- | --- | --- |
+| 输入审计 | `00-输入审计.md` | 检查 Word 结构、样式、图片、表格、批注、修订、脚注尾注和参考文献线索。 |
+| 正文主源 | `01-论文主源.md` | 保留正文、图表、题注、资料来源、引用、参考文献、附录、致谢等内容。 |
+| 转换检查 | `02-转换检查.md` | 检查图片链接、图题、表题、引用编号、参考文献、占位符和人工复核项。 |
+| 模板规则 | `00-模板规则.md` | 记录从 LaTeX 模板和范例中整理出的格式规则。 |
+| LaTeX 与 PDF | `03-LaTeX工程/`, `04-PDF输出/` | 生成 LaTeX 工程并编译最终 PDF。 |
+
+默认输出结构：
 
 ```text
 00-模板规则.md
@@ -102,7 +102,7 @@ python3 manuscript-to-latex-pdf/scripts/validate_manuscript.py 01-论文主源.m
 04-PDF输出/
 ```
 
-For large manuscripts, the skill may split the Markdown source into chapter files:
+如果论文较长，可以拆分为章节文件：
 
 ```text
 01-Markdown主源/
@@ -114,32 +114,44 @@ For large manuscripts, the skill may split the Markdown source into chapter file
 └── 91-附录.md
 ```
 
-Splitting is for context management only. Figures and tables should remain in the relevant chapter context.
+拆分只是为了便于上下文管理和局部修改。图片、表格和题注仍应保留在对应章节语境中。
 
-## Provide a LaTeX Template
+## 准备 LaTeX 模板
 
-Before generating LaTeX, give the agent the template files and examples that define the target format:
+生成 LaTeX 前，建议提供以下材料：
 
 - `.cls` / `.sty`
 - `main.tex`
-- sample chapter `.tex`
-- sample PDF
-- bibliography examples
-- compile notes
-- official formatting instructions
+- 章节 `.tex` 范例
+- 模板 PDF 范例
+- 参考文献写法示例
+- 编译说明
+- 官方格式要求
 
-The LaTeX template is the formatting authority. Markdown is the human-editable content authority after extraction.
+原则很简单：LaTeX 模板决定格式，Markdown 主源承载正文，PDF 只作为最终验收结果。
 
-## What It Does Not Do
+## Skill 目录结构
 
-- It does not rewrite academic content unless explicitly requested.
-- It does not fabricate references, source notes, figure numbers, table numbers, page numbers, or successful validation status.
-- It does not include school-specific or journal-specific template rules by default.
-- It does not guarantee perfect Word fidelity for complex DOCX features such as merged tables, tracked changes, footnotes, comments, automatic numbering, floating text boxes, or embedded objects. These are flagged for manual review.
+```text
+manuscript-to-latex-pdf/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+├── references/
+│   ├── template-rules.md
+│   ├── validation-loop.md
+│   └── word-to-markdown.md
+└── scripts/
+    ├── audit_docx.py
+    ├── extract_docx_to_md.py
+    └── validate_manuscript.py
+```
 
-## Examples
+只有 `manuscript-to-latex-pdf/` 是可复用的 Skill 本体。仓库根目录的 README、示例、测试和 GitHub Actions 是公开发布与开发材料。
 
-The `examples/` directory contains a tiny self-authored fixture:
+## 示例
+
+`examples/` 目录包含一个极简自制样例：
 
 ```text
 examples/
@@ -150,27 +162,43 @@ examples/
     └── 图1-1-论文转换流程示意图.svg
 ```
 
-Run the smoke test:
+运行 smoke test：
 
 ```bash
 python3 tests/smoke_test.py
 ```
 
-## Use with Private Documents
+## 能力边界
 
-Do not commit private manuscripts, confidential review comments, paid school templates, personal data, or unreleased thesis content to a public repository.
+- 不会在用户未要求时改写学术内容。
+- 不会编造参考文献、资料来源、图号、表号、页码或“已通过”的验证结论。
+- 默认不内置任何学校、期刊或机构的专属模板规则。
+- 不保证复杂 Word 特性完全自动还原，例如合并表格、修订痕迹、脚注、批注、自动编号、文本框和嵌入对象；这些内容会进入人工复核。
 
-For public examples, use tiny self-authored fixtures or templates that are clearly licensed for redistribution.
+## 处理私有文档
 
-## Development
+不要把私人论文、盲审意见、付费模板、个人信息、未公开论文内容提交到公开仓库。
+
+如果需要放模板示例，应使用自己编写的极简模板，或使用明确允许再分发的模板。
+
+## 开发检查
 
 ```bash
 python3 -m py_compile manuscript-to-latex-pdf/scripts/*.py tests/*.py
 python3 tests/smoke_test.py
 ```
 
-GitHub Actions runs the same checks on push and pull request.
+GitHub Actions 会在 push 和 pull request 时运行同样的检查。
 
-## License
+## 贡献
+
+欢迎提交 Issue 或 Pull Request，尤其是：
+
+- 不同学校或期刊模板的转换经验。
+- Word 表格、脚注、批注、修订痕迹的处理改进。
+- Markdown 到 LaTeX 的映射规则改进。
+- 更好的示例和测试用例。
+
+## 开源协议
 
 MIT License.
