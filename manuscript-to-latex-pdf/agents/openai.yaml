@@ -1,0 +1,8 @@
+interface:
+  display_name: "Manuscript to LaTeX PDF"
+  short_description: "Convert Word or Markdown papers into template-compliant LaTeX/PDF."
+  brand_color: "#1F6FEB"
+  default_prompt: "Use $manuscript-to-latex-pdf to convert this manuscript into a LaTeX project and PDF based on the provided template."
+policy:
+  allow_implicit_invocation: true
+
